@@ -1,293 +1,258 @@
-# DELIVERA — Launch Guide
-## Zero-to-live deployment: GitHub → Vercel → Supabase → Monetbil
+# DELIVERA V2.7 — Complete Launch Guide
+## From zero to live in Yaoundé + Douala
+
+---
+
+## 📦 FILES IN THIS PACKAGE
+
+| File | Purpose |
+|------|---------|
+| `index.html` | Main PWA app — home, cart, checkout, receipt, dashboards |
+| `onboarding.html` | Picker + Store partner registration (fully wired) |
+| `track.html` | Live order tracking (Yango-style) |
+| `manifest.json` | PWA install config |
+| `sw.js` | Service worker — offline support |
+| `lang.js` | EN/FR language system |
+| `offline.html` | Offline fallback |
+| `icon-192.svg` | App icon 192×192 |
+| `icon-512.svg` | App icon 512×512 |
+| `vercel.json` | Deployment config (no warnings) |
+| `api/pay.js` | Monetbil payment route |
+| `api/monetbil-webhook.js` | Payment confirmation handler |
+| `api/send-otp.js` | WhatsApp OTP |
+| `api/save-order.js` | Save orders to Supabase |
+| `supabase-schema.sql` | Complete database schema |
 
 ---
 
 ## ✅ PRE-LAUNCH CHECKLIST
 
-### Files in this package
-- [x] `index.html` — Full PWA app (85KB, all screens)
-- [x] `manifest.json` — PWA install config
-- [x] `sw.js` — Service worker (offline support)
-- [x] `lang.js` — EN/FR language system
-- [x] `offline.html` — Offline fallback page
-- [x] `vercel.json` — Vercel deployment config
-- [x] `api/pay.js` — Monetbil payment route
-- [x] `api/monetbil-webhook.js` — Payment confirmation
-- [x] `api/send-otp.js` — WhatsApp OTP
+- [ ] GitHub account created
+- [ ] Vercel account created (free)
+- [ ] Supabase project created (free)
+- [ ] Monetbil account created
+- [ ] MoMo number ready for picker payment destination
+- [ ] WhatsApp Business number ready
+- [ ] SME registration documents ready
 
 ---
 
-## STEP 1 — GitHub (10 minutes)
+## STEP 1 — GITHUB (10 min)
 
-1. Go to **github.com** → sign in or create free account
-2. Click the **+** icon (top right) → **New repository**
-3. Name: `delivera` → set to **Public** → click **Create repository**
-4. On the next page, click **uploading an existing file**
-5. Drag ALL files from this ZIP into the upload area:
-   - `index.html`
-   - `manifest.json`
-   - `sw.js`
-   - `lang.js`
-   - `offline.html`
-   - `vercel.json`
-   - `api/pay.js` ← make sure to create the `api/` folder first
-   - `api/monetbil-webhook.js`
-   - `api/send-otp.js`
-6. Scroll down → click **Commit changes**
+1. Go to **github.com** → sign in → click **+** → **New repository**
+2. Name: `delivera` → Public → **Create repository**
+3. On the repo page → click **uploading an existing file**
+4. Extract this ZIP and drag ALL files + the `api/` folder
+5. Write commit message: `DELIVERA v2.7 launch` → **Commit changes**
 
-✅ Your code is now on GitHub.
+> ⚠️ Make sure the `api/` folder uploads with its 4 files inside it.
 
 ---
 
-## STEP 2 — Vercel (5 minutes)
+## STEP 2 — VERCEL (5 min)
 
-1. Go to **vercel.com** → click **Sign up** → choose **Continue with GitHub**
-2. Authorize Vercel to access your GitHub
-3. Click **Add New Project**
-4. Find your `delivera` repo → click **Import**
-5. Leave all settings default → click **Deploy**
-6. Wait ~60 seconds → you'll get a live URL like `delivera.vercel.app`
+1. Go to **vercel.com** → **Sign up with GitHub**
+2. **Add New Project** → import your `delivera` repo
+3. Leave all settings default → **Deploy**
+4. ✅ You get: `delivera.vercel.app` — live immediately
 
-✅ Your app is live. Visit the URL — DELIVERA should open.
+**To add your own domain later:**
+- Vercel → Settings → Domains → add `delivera.cm`
+- Point DNS at Vercel (they show you exactly how)
 
 ---
 
-## STEP 3 — Supabase (15 minutes)
+## STEP 3 — SUPABASE (15 min)
 
 ### 3a. Create project
-1. Go to **supabase.com** → **Start for free** → sign up
-2. Click **New Project**
+1. **supabase.com** → **Start for free** → **New Project**
    - Name: `delivera`
-   - Database password: generate one, SAVE IT somewhere safe
-   - Region: **West EU (Ireland)** — closest to Cameroon
-3. Wait ~2 minutes for project to initialize
+   - Password: generate strong password, **SAVE IT**
+   - Region: **West EU (Ireland)** — best latency for Cameroon
+2. Wait 2 minutes
 
 ### 3b. Get your keys
-1. Go to **Settings** (gear icon, left sidebar) → **API**
-2. Copy and save:
-   - **Project URL** → looks like `https://abcdef.supabase.co`
-   - **anon/public key** → long string starting with `eyJ...`
-   - **service_role key** → another long string (keep this SECRET)
+1. Left sidebar → **Settings** (gear icon) → **API**
+2. Copy and save these 3 values:
+   - **Project URL** → `https://XXXXXXXX.supabase.co`
+   - **anon/public key** → starts with `eyJhbGciOi...`
+   - **service_role key** → starts with `eyJhbGciOi...` (different, longer one — KEEP SECRET)
 
-### 3c. Create the database tables
-1. Click **SQL Editor** (left sidebar, looks like `>_`)
-2. Click **New query**
-3. Paste the SQL below and click **Run**:
+> 📸 The Project URL is NOT the "Publishable key". It's the URL at the top of the API settings page.
 
-```sql
--- Users / profiles
-create table if not exists profiles (
-  id uuid references auth.users primary key,
-  role text check (role in ('buyer','picker','store','admin')),
-  full_name text,
-  phone text unique,
-  city text,
-  zone text,
-  status text default 'pending',
-  rating numeric default 5.0,
-  created_at timestamptz default now()
-);
+### 3c. Create all database tables
+1. Left sidebar → **SQL Editor** → **New query**
+2. Open `supabase-schema.sql` from this package
+3. Copy the entire contents → paste into the SQL editor
+4. Click **Run** (green button, top right)
+5. Should say: "Success. No rows returned"
 
--- OTP codes (for phone verification)
-create table if not exists otp_codes (
-  phone text primary key,
-  code text,
-  expires_at timestamptz
-);
+✅ All tables, storage buckets, and security policies are created.
 
--- Picker applications
-create table if not exists picker_applications (
-  id uuid default gen_random_uuid() primary key,
-  full_name text,
-  phone text,
-  city text,
-  zones text[],
-  cni_front_url text,
-  cni_back_url text,
-  selfie_url text,
-  quiz_score integer,
-  quiz_passed boolean default false,
-  offers_delivery boolean default false,
-  vehicle_type text,
-  status text default 'pending',
-  created_at timestamptz default now()
-);
+---
 
--- Stores
-create table if not exists stores (
-  id uuid default gen_random_uuid() primary key,
-  owner_id uuid,
-  name text,
-  category text,
-  city text,
-  zone text,
-  address text,
-  phone text,
-  open boolean default true,
-  verified boolean default false,
-  rating numeric default 5.0,
-  created_at timestamptz default now()
-);
+## STEP 4 — ENVIRONMENT VARIABLES IN VERCEL (5 min)
 
--- Products
-create table if not exists products (
-  id uuid default gen_random_uuid() primary key,
-  store_id uuid references stores(id),
-  name text,
-  price integer,
-  stock integer default 0,
-  emoji text,
-  available boolean default true,
-  created_at timestamptz default now()
-);
+1. Vercel → your `delivera` project → **Settings** → **Environment Variables**
+2. Add each variable:
 
--- Orders
-create table if not exists orders (
-  id text primary key,
-  buyer_phone text,
-  picker_id uuid,
-  status text default 'placed',
-  delivery_mode text,
-  delivery_address text,
-  payment_method text,
-  payment_status text default 'pending',
-  subtotal integer,
-  delivery_fee integer,
-  service_fee integer,
-  total integer,
-  pin text,
-  monetbil_ref text,
-  created_at timestamptz default now()
-);
+| Name | Value | Where to get |
+|------|-------|--------------|
+| `SUPABASE_URL` | `https://XXXX.supabase.co` | Supabase → Settings → API → Project URL |
+| `SUPABASE_ANON_KEY` | `eyJhbGci...` (shorter) | Supabase → Settings → API → anon/public |
+| `SUPABASE_SERVICE_KEY` | `eyJhbGci...` (longer) | Supabase → Settings → API → service_role |
+| `MONETBIL_SERVICE_KEY` | from Monetbil dashboard | Step 5 below |
+| `MONETBIL_SECRET` | from Monetbil dashboard | Step 5 below |
+| `DIALOG360_API_KEY` | from 360dialog | Step 6 below (optional) |
 
--- Order items
-create table if not exists order_items (
-  id uuid default gen_random_uuid() primary key,
-  order_id text references orders(id),
-  product_name text,
-  store_name text,
-  unit_price integer,
-  qty integer,
-  line_total integer
-);
+3. After adding all: **Deployments** tab → 3 dots on latest → **Redeploy**
 
--- File storage bucket for picker ID documents
-insert into storage.buckets (id, name, public)
-values ('delivera-docs', 'delivera-docs', false)
-on conflict do nothing;
+> 📸 In Vercel env vars: "Name" = left column, "Value" = right column, "Environment" = select All (Production + Preview + Development)
+
+---
+
+## STEP 5 — MONETBIL PAYMENTS (30 min)
+
+1. **monetbil.com** → **Create Account**
+   - Business name: DELIVERA (or your SME name)
+   - Country: Cameroon
+   - Email: your business email
+2. Verify email
+3. Dashboard → **Services** → **Add Service**
+   - Name: `DELIVERA`
+   - Currency: `XAF`
+   - Enable: MTN Mobile Money ✅ Orange Money ✅
+4. **Set webhook URL:**
+   `https://delivera.vercel.app/api/monetbil-webhook`
+5. Copy **Service Key** + **Service Secret** → paste into Vercel env vars
+
+**For picker onboarding fees (500 FCFA):**
+- The payment goes to your Monetbil merchant account
+- Monetbil settles to your MTN MoMo Business or bank account
+- To add your MoMo receiving number: Monetbil → Account → Payout settings
+
+> ⚠️ Monetbil may ask for RCCM for full activation. Use sandbox mode for testing until you have it.
+
+---
+
+## STEP 6 — WHATSAPP (optional Phase 1)
+
+For Phase 1, the app uses click-to-chat WhatsApp (no API needed — zero cost).
+For Phase 2 (automated order confirmations):
+
+1. **360dialog.com** → **Get Started**
+2. Connect dedicated WhatsApp Business number
+3. Complete Meta Business verification (takes 24-48h)
+4. Get API key → add to Vercel as `DIALOG360_API_KEY`
+
+---
+
+## STEP 7 — LEGAL (Week 1, can run parallel)
+
+**Can you launch under your existing SME? YES.**
+- Use your SME as the operating entity
+- Add "DELIVERA" as a trade name (enseigne commerciale)
+- No new registration needed to start taking orders
+
+**When you scale (Month 2-3):**
+- Register SARL at CFCE Yaoundé (~50,000 FCFA, 72h)
+- Open Afriland or UBA business account
+- Register MTN MoMo Business + Orange Money Merchant accounts
+
+---
+
+## PICKER FEE DESTINATION
+
+To wire picker onboarding fees to YOUR number:
+1. Open `onboarding.html`
+2. Find this line: `// In production: call /api/pay with Monetbil`
+3. The payment flows through your Monetbil merchant account
+4. Monetbil pays out to whatever number you register in their payout settings
+
+**Add your MoMo number** in Monetbil → Account Settings → Payout → Add Mobile Money Number
+
+---
+
+## INVENTORY STRATEGY — HOW TO MAX OUT BEFORE LAUNCH
+
+**The playbook (no waiting for stores to come online):**
+
+1. **Pickers upload store inventory during registration**
+   - In onboarding, picker selects their store zone
+   - After approval, they get access to "Add products" in their dashboard
+   - They photograph and upload items from their regular stores
+   - Same product from 3 pickers = price comparison is automatic
+
+2. **Coming Soon banner for consumers** (already in index.html)
+   - Consumers see: "DELIVERA arrive bientôt · DELIVERA coming soon"
+   - Waitlist CTA: "Sois parmi les premiers · Be first"
+   - Pickers CAN register immediately (onboarding live)
+   - Stores CAN register immediately
+
+3. **Price lock rule:** Picker sets price at upload → locked → they cannot edit in the field. Only available/unavailable toggle. Price mismatch = flag → customer approval.
+
+4. **Auto product matching:** Same product name from multiple stores = grouped. Buyer sees "Rice 5kg — best price: Santa Lucia 5,200F" automatically.
+
+---
+
+## LAUNCH SEQUENCE
+
+### Week 1: Viral content (no app reveal)
+```
+TikTok/Reels:
+- "POV: jamais aller au marché encore"
+- "Regarder ses courses se faire en direct 🎥"
+- "Santa Lucia vs Dovv — qui est moins cher ?"
+No CTA yet. Just curiosity.
 ```
 
-4. Click **Run** — you should see "Success. No rows returned"
+### Week 2: Picker recruitment
+```
+"Rejoins DELIVERA — gagne 700F+ par commande"
+"Flexible. Chez toi. Ta ville."
+→ Link: delivera.vercel.app/onboarding
+```
 
-✅ Database is ready.
+### Week 3: Store partners
+```
+DM Santa Lucia, Dovv, Glam Parfumerie
+"Mettre ta boutique en ligne gratuitement"
+"Zéro commission au lancement"
+```
 
----
-
-## STEP 4 — Add environment variables to Vercel (5 minutes)
-
-1. Go back to **vercel.com** → click your `delivera` project
-2. Click **Settings** (top tabs) → **Environment Variables**
-3. Add each variable below (click **Add** after each):
-
-| Name | Value |
-|------|-------|
-| `SUPABASE_URL` | Your Supabase Project URL |
-| `SUPABASE_ANON_KEY` | Your Supabase anon/public key |
-| `SUPABASE_SERVICE_KEY` | Your Supabase service_role key |
-| `MONETBIL_SERVICE_KEY` | From Monetbil dashboard (get in Step 5) |
-| `MONETBIL_SECRET` | From Monetbil dashboard |
-| `DIALOG360_API_KEY` | From 360dialog (get in Step 6) |
-
-4. After adding all variables → go to **Deployments** tab → click the **3 dots** on latest deployment → **Redeploy**
-
-✅ App now has access to all services.
+### Week 4: Consumer launch
+```
+"DELIVERA est LIVE — commande maintenant"
+First live order filmed and posted immediately
+```
 
 ---
 
-## STEP 5 — Monetbil payments (30 minutes)
-
-1. Go to **monetbil.com** → **Create Account**
-2. Fill in: Business name: DELIVERA, Country: Cameroon
-3. Verify your email
-4. Go to **Dashboard** → **Services** → **Add Service**
-   - Service name: `DELIVERA Orders`
-   - Currency: `XAF`
-   - Enable: MTN Mobile Money ✅ Orange Money ✅ Card ✅
-5. Set Webhook URL: `https://your-vercel-url.vercel.app/api/monetbil-webhook`
-6. Copy **Service Key** and **Service Secret** → add to Vercel env vars above
-
-> ⚠️ Monetbil may require a business registration document (RCCM) before going live.
-> For testing: use their sandbox mode which works without documents.
-
----
-
-## STEP 6 — 360dialog WhatsApp (optional for Phase 1)
-
-For Phase 1, WhatsApp notifications are click-to-chat (no API needed).
-For Phase 2 automated messages:
-
-1. Go to **360dialog.com** → **Get Started Free**
-2. Connect a dedicated WhatsApp Business number (buy a separate SIM)
-3. Complete Meta Business Manager verification
-4. Get your API key
-5. Add as `DIALOG360_API_KEY` in Vercel env vars
-6. Create message templates in the 360dialog portal:
-   - `order_confirmed` — "Ta commande {1} est confirmée ! 🎉"
-   - `picker_assigned` — "Un picker est en route vers le magasin"
-   - `order_delivered` — "Livré ! Merci d'avoir choisi DELIVERA"
-
-> ⏱️ Meta template approval takes 24-48 hours.
-
----
-
-## STEP 7 — Legal (Week 1)
-
-Register in Cameroon:
-1. **CFCE Yaoundé** (Centre de Formalités de Création d'Entreprises)
-   - Register SARL (SARL = LLC equivalent)
-   - Cost: ~50,000 FCFA
-   - Time: 72 hours
-   - Get: RCCM (Registre du Commerce) number
-2. Open **Afriland First Bank** or **UBA** business account
-3. Register **MTN MoMo Business** + **Orange Money Merchant** accounts
-   - Both free, done at MTN/Orange Business Centers
-   - Required documents: RCCM + ID + business address
-
----
-
-## STEP 8 — Launch sequence
-
-### Week 1: Content first
-- TikTok/Reels/Facebook pages live
-- 3 teaser videos (no app reveal yet)
-- "Something is coming to Yaoundé & Douala 👀"
-
-### Week 2: Recruitment
-- "Rejoins l'équipe DELIVERA — gagne par commande"
-- Picker onboarding page live (link in bio)
-- DM Santa Lucia, Dovv, Niki, Glam Parfumerie
-
-### Week 3: Launch
-- Announce date publicly
-- Countdown content daily
-- Film first live order → post immediately
-- 🚀 GO LIVE
-
----
-
-## Monthly running costs
+## MONTHLY COSTS AT LAUNCH
 
 | Service | Cost |
 |---------|------|
-| Vercel (hosting) | Free |
-| Supabase (database) | Free (up to 500MB) |
-| Monetbil (payments) | ~2-3% per transaction |
-| 360dialog (WhatsApp) | ~$50/month after free tier |
-| Domain (delivera.cm) | ~5,000 FCFA/year |
-| **Total fixed** | **~$0-5/month at launch** |
+| Vercel | Free |
+| Supabase | Free (up to 500MB, 50K rows) |
+| Monetbil | ~2.5% per transaction |
+| 360dialog WhatsApp | Free tier → $50/month |
+| Domain `delivera.cm` | ~5,000 FCFA/year |
+| **Total fixed** | **~$0/month** |
 
 ---
 
-## Support
-WhatsApp the ops number for issues during launch.
+## SUPPORT & TROUBLESHOOTING
+
+**White page / 404 on onboarding:**
+→ Make sure `onboarding.html` was uploaded to GitHub root (not in a subfolder)
+→ Check Vercel → Deployments → click latest deploy → browse files
+
+**Vercel config warning:**
+→ This package uses `rewrites` only, not `builds`. Warning should be gone.
+
+**Supabase connection error:**
+→ Double-check SUPABASE_URL has no trailing slash
+→ Make sure you're using the Project URL, not the REST URL
+
+**Payment not processing:**
+→ Use Monetbil sandbox mode: add `sandbox=true` to test without real money

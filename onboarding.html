@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#0A0A0A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>DELIVERA — Rejoindre l'équipe</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --black:#0A0A0A;--gold:#C9A84C;--gl:rgba(201,168,76,.12);--gb:rgba(201,168,76,.28);
+  --s1:#141414;--s2:#1E1E1E;--s3:#282828;
+  --b1:rgba(255,255,255,.07);--b2:rgba(201,168,76,.18);
+  --tx:#FAFAF8;--t2:#A8A89A;--t3:#606058;
+  --green:#27AE60;--red:#E74C3C;--r:14px;
+}
+html,body{min-height:100%;background:var(--black);color:var(--tx);font-family:'DM Sans',sans-serif;font-size:15px}
+#app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.step{display:none;flex:1;flex-direction:column;padding:0 0 32px}
+.step.active{display:flex}
+
+/* HEADER */
+.ob-head{display:flex;align-items:center;gap:12px;padding:16px 20px 10px}
+.back-btn{width:36px;height:36px;border-radius:50%;background:var(--s2);border:.5px solid var(--b1);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.back-btn svg{width:16px;height:16px;stroke:var(--tx)}
+.ob-progress{flex:1;height:3px;background:var(--s2);border-radius:2px;overflow:hidden}
+.ob-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s ease}
+.step-num{font-size:11px;color:var(--t3);white-space:nowrap}
+
+/* ROLE SELECT */
+.role-hero{padding:36px 24px 20px;text-align:center}
+.role-logo{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;letter-spacing:-2px}
+.role-logo b{color:var(--gold)}
+.role-tag{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--t3);margin-top:4px}
+.role-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-.5px;margin-top:24px;line-height:1.25}
+.role-title b{color:var(--gold)}
+.role-cards{padding:4px 20px;display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.role-card{background:var(--s1);border:.5px solid var(--b1);border-radius:18px;padding:18px 18px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px}
+.role-card:active,.role-card.selected{border-color:var(--gold);background:var(--gl)}
+.rc-em{font-size:32px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:var(--s2);border-radius:12px}
+.rc-info{flex:1}
+.rc-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
+.rc-desc{font-size:11px;color:var(--t2);margin-top:2px;line-height:1.5}
+.rc-earn{margin-top:6px;display:inline-block;background:var(--gl);border:.5px solid var(--gb);color:var(--gold);font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px}
+.rc-check{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--b1);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.role-card.selected .rc-check{background:var(--gold);border-color:var(--gold)}
+.rc-check svg{width:11px;height:11px;stroke:var(--black);display:none}
+.role-card.selected .rc-check svg{display:block}
+
+/* FORM SECTIONS */
+.ob-body{padding:8px 20px;flex:1}
+.ob-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px;line-height:1.3}
+.ob-title b{color:var(--gold)}
+.ob-sub{font-size:12px;color:var(--t2);margin-bottom:20px;line-height:1.5}
+
+/* INPUTS */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.inp{width:100%;background:var(--s1);border:.5px solid var(--b1);border-radius:var(--r);padding:13px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s;-webkit-appearance:none}
+.inp:focus{border-color:rgba(201,168,76,.5)}
+.inp::placeholder{color:var(--t3)}
+select.inp{cursor:pointer}
+.phone-row{display:flex;gap:8px}
+.phone-pre{width:80px;flex-shrink:0}
+.inp-icon{position:relative}
+.inp-icon .inp{padding-left:40px}
+.inp-icon svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--t3)}
+
+/* OTP */
+.otp-row{display:flex;gap:10px;justify-content:center;margin:16px 0}
+.otp-cell{width:52px;height:58px;background:var(--s1);border:.5px solid var(--b1);border-radius:12px;text-align:center;font-size:24px;font-weight:700;color:var(--tx);font-family:'Syne',sans-serif;outline:none;caret-color:var(--gold)}
+.otp-cell:focus{border-color:rgba(201,168,76,.6)}
+.otp-resend{font-size:12px;color:var(--t2);text-align:center;margin-top:8px}
+.otp-resend span{color:var(--gold);cursor:pointer;text-decoration:underline}
+
+/* ZONE CHIPS */
+.zones-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.zone-chip{padding:7px 13px;background:var(--s1);border:.5px solid var(--b1);border-radius:20px;font-size:12px;cursor:pointer;transition:all .2s;user-select:none}
+.zone-chip.on{background:var(--gl);border-color:var(--gold);color:var(--gold);font-weight:600}
+
+/* UPLOAD AREAS */
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.upload-box{background:var(--s1);border:.5px dashed var(--b1);border-radius:14px;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.upload-box:active{border-color:var(--gold)}
+.upload-box.done{border-style:solid;border-color:var(--green)}
+.upload-box svg{width:24px;height:24px;stroke:var(--t3)}
+.upload-box.done svg{stroke:var(--green)}
+.upload-box span{font-size:11px;color:var(--t3);text-align:center;padding:0 8px}
+.upload-box.done span{color:var(--green)}
+.upload-box input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-full{margin-top:10px}
+.upload-full .upload-box{grid-column:1/-1;min-height:80px;flex-direction:row;gap:10px}
+
+/* TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;background:var(--s1);border:.5px solid var(--b1);border-radius:var(--r);padding:14px 16px;cursor:pointer}
+.toggle-info .t{font-size:13px;font-weight:500}
+.toggle-info .s{font-size:11px;color:var(--t2);margin-top:2px}
+.sw{width:44px;height:24px;background:var(--s3);border-radius:12px;position:relative;transition:background .2s;flex-shrink:0}
+.sw::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s}
+.sw.on{background:var(--gold)}
+.sw.on::after{transform:translateX(20px)}
+
+/* VEHICLE CHIPS */
+.vehicle-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.vchip{padding:8px 14px;background:var(--s1);border:.5px solid var(--b1);border-radius:12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s}
+.vchip.on{background:var(--gl);border-color:var(--gold);color:var(--gold)}
+
+/* HOURS */
+.hours-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.day-row{background:var(--s1);border:.5px solid var(--b1);border-radius:12px;padding:10px 12px}
+.day-row label{font-size:11px;color:var(--t2);display:block;margin-bottom:4px}
+.day-toggle{display:flex;align-items:center;justify-content:space-between}
+.day-name{font-size:13px;font-weight:500}
+
+/* QUIZ */
+.quiz-q{background:var(--s1);border:.5px solid var(--b1);border-radius:16px;padding:18px;margin-bottom:12px}
+.quiz-num{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.quiz-text{font-size:14px;font-weight:500;line-height:1.5;margin-bottom:14px}
+.quiz-opts{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{padding:10px 14px;background:var(--s2);border:.5px solid var(--b1);border-radius:10px;font-size:13px;cursor:pointer;transition:all .2s}
+.quiz-opt:active,.quiz-opt.selected{border-color:var(--gold);background:var(--gl);color:var(--gold)}
+.quiz-opt.correct{border-color:var(--green);background:rgba(39,174,96,.1);color:var(--green)}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(231,76,60,.1);color:var(--red)}
+.quiz-progress{display:flex;gap:6px;margin-bottom:16px}
+.qp{flex:1;height:3px;background:var(--s2);border-radius:2px}
+.qp.done{background:var(--gold)}
+
+/* PAYMENT */
+.pay-summary{background:var(--s1);border:.5px solid var(--gb);border-radius:18px;padding:18px;margin-bottom:16px}
+.pay-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+.pay-row+.pay-row{border-top:.5px solid var(--b1)}
+.pay-label{font-size:12px;color:var(--t2)}
+.pay-val{font-size:13px;font-weight:600}
+.pay-total .pay-label{font-size:14px;color:var(--tx);font-weight:600}
+.pay-total .pay-val{font-size:18px;font-weight:800;color:var(--gold);font-family:'Syne',sans-serif}
+.pay-methods{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.pay-method{background:var(--s1);border:.5px solid var(--b1);border-radius:var(--r);padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all .2s}
+.pay-method.selected{border-color:var(--gold);background:var(--gl)}
+.pay-method-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pm-mtn{background:rgba(255,204,0,.1)}
+.pm-om{background:rgba(255,102,0,.1)}
+.pm-info{flex:1}
+.pm-name{font-size:13px;font-weight:600}
+.pm-sub{font-size:11px;color:var(--t2)}
+.pm-radio{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--b1);flex-shrink:0;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.pay-method.selected .pm-radio{border-color:var(--gold);background:var(--gold)}
+.pm-radio svg{display:none;width:9px;height:9px;fill:var(--black)}
+.pay-method.selected .pm-radio svg{display:block}
+
+/* RECEIPT */
+.receipt-screen{text-align:center;padding:28px 24px}
+.receipt-icon{width:72px;height:72px;background:rgba(39,174,96,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.receipt-icon svg{width:34px;height:34px;stroke:var(--green)}
+.receipt-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px}
+.receipt-sub{font-size:13px;color:var(--t2);line-height:1.6}
+.receipt-card{background:var(--s1);border:.5px solid var(--gb);border-radius:18px;padding:20px;margin:20px 0;text-align:left}
+.rc-field{display:flex;justify-content:space-between;padding:8px 0;border-bottom:.5px solid var(--b1)}
+.rc-field:last-child{border-bottom:none}
+.rc-field-label{font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
+.rc-field-val{font-size:13px;font-weight:600;text-align:right;max-width:60%}
+.status-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,165,0,.1);border:.5px solid rgba(255,165,0,.3);color:#F5A623;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600}
+
+/* BOTTOM CTA */
+.ob-cta{padding:16px 20px 0;flex-shrink:0}
+.btn{width:100%;padding:14px;background:var(--gold);border:none;border-radius:var(--r);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--black);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:-.2px;transition:opacity .15s}
+.btn:active{opacity:.8}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;border:1.5px solid var(--b1);color:var(--t2)}
+.btn.grn{background:var(--green);color:#fff}
+.spin{width:16px;height:16px;border:2px solid rgba(0,0,0,.25);border-top-color:var(--black);border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--s2);border:.5px solid var(--b1);padding:10px 18px;border-radius:40px;font-size:13px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:9999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ═══ STEP 0: ROLE SELECT ═══ -->
+<div class="step active" id="s0">
+  <div style="padding:36px 24px 20px;text-align:center">
+    <div class="role-logo">DELIV<b>ERA</b></div>
+    <div class="role-tag">Rejoindre l'équipe · Join the team</div>
+    <div class="role-title" style="margin-top:28px">Quel est ton <b>rôle</b> ?<br><span style="font-size:14px;font-weight:400;color:var(--t2)">What's your role?</span></div>
+  </div>
+  <div class="role-cards">
+    <div class="role-card" id="rc-picker" onclick="selectRole('picker')">
+      <div class="rc-em">🧍</div>
+      <div class="rc-info">
+        <div class="rc-title">Picker / Livreur</div>
+        <div class="rc-desc">Fais des achats et livre des commandes dans ta zone · Shop and deliver orders in your area</div>
+        <div class="rc-earn">Gagne 700 FCFA+ / commande</div>
+      </div>
+      <div class="rc-check"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+    </div>
+    <div class="role-card" id="rc-store" onclick="selectRole('store')">
+      <div class="rc-em">🏪</div>
+      <div class="rc-info">
+        <div class="rc-title">Partenaire Boutique</div>
+        <div class="rc-desc">Liste ta boutique, gérer ton inventaire, reçois des commandes · List your store and receive orders</div>
+        <div class="rc-earn">Zéro commission au lancement</div>
+      </div>
+      <div class="rc-check"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+    </div>
+  </div>
+  <div class="ob-cta">
+    <button class="btn" id="role-next" disabled onclick="nextStep()">Continuer · Continue</button>
+    <div style="text-align:center;margin-top:14px"><a href="index.html" style="font-size:12px;color:var(--t3);text-decoration:none">← Retour à l'accueil</a></div>
+  </div>
+</div>
+
+<!-- ═══ STEP 1: PHONE ═══ -->
+<div class="step" id="s1">
+  <div class="ob-head">
+    <div class="back-btn" onclick="prevStep()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="ob-progress"><div class="ob-fill" id="prog" style="width:12%"></div></div>
+    <div class="step-num" id="snum">1 / 8</div>
+  </div>
+  <div class="ob-body">
+    <div class="ob-title">Ton <b>numéro</b> de téléphone</div>
+    <div class="ob-sub">On t'envoie un code de vérification via WhatsApp · We'll send a verification code via WhatsApp</div>
+    <div class="field">
+      <label>Numéro · Phone number</label>
+      <div class="phone-row">
+        <select class="inp phone-pre" id="phone-prefix">
+          <option value="237">🇨🇲 +237</option>
+          <option value="33">🇫🇷 +33</option>
+          <option value="1">🇺🇸 +1</option>
+          <option value="44">🇬🇧 +44</option>
+          <option value="234">🇳🇬 +234</option>
+        </select>
+        <input class="inp" id="phone-inp" type="tel" placeholder="6XX XXX XXX" maxlength="9" oninput="checkPhone()">
+      </div>
+    </div>
+    <div style="background:var(--s1);border:.5px solid var(--b1);border-radius:12px;padding:12px 14px;font-size:11px;color:var(--t2);line-height:1.6;margin-top:8px">
+      🔒 Ton numéro est utilisé uniquement pour vérifier ton identité et recevoir des notifications de commandes.<br>
+      <span style="color:var(--t3)">Your number is used only for identity verification and order notifications.</span>
+    </div>
+  </div>
+  <div class="ob-cta">
+    <button class="btn" id="phone-next" disabled onclick="sendOTP()">Envoyer le code · Send code</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 2: OTP ═══ -->
+<div class="step" id="s2">
+  <div class="ob-head">
+    <div class="back-btn" onclick="prevStep()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="ob-progress"><div class="ob-fill" style="width:25%"></div></div>
+    <div class="step-num">2 / 8</div>
+  </div>
+  <div class="ob-body">
+    <div class="ob-title">Entre le <b>code</b></div>
+    <div class="ob-sub" id="otp-sub">Code envoyé sur WhatsApp au +237 ...</div>
+    <div class="otp-row">
+      <input class="otp-cell" id="o1" maxlength="1" type="tel" oninput="otpMove(this,'o2')">
+      <input class="otp-cell" id="o2" maxlength="1" type="tel" oninput="otpMove(this,'o3')" onkeydown="otpBack(this,event,'o1')">
+      <input class="otp-cell" id="o3" maxlength="1" type="tel" oninput="otpMove(this,'o4')" onkeydown="otpBack(this,event,'o2')">
+      <input class="otp-cell" id="o4" maxlength="1" type="tel" oninput="otpMove(this,'o5')" onkeydown="otpBack(this,event,'o3')">
+      <input class="otp-cell" id="o5" maxlength="1" type="tel" oninput="otpMove(this,'o6')" onkeydown="otpBack(this,event,'o4')">
+      <input class="otp-cell" id="o6" maxlength="1" type="tel" oninput="checkOTP()" onkeydown="otpBack(this,event,'o5')">
+    </div>
+    <div class="otp-resend">Pas reçu ? <span onclick="sendOTP()">Renvoyer · Resend</span></div>
+    <div style="background:rgba(201,168,76,.06);border:.5px solid var(--gb);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--t2);margin-top:16px;line-height:1.5">
+      <b style="color:var(--gold)">💡 Dev mode:</b> Code de test · Test code: <b style="color:var(--gold)" id="dev-otp">123456</b>
+    </div>
+  </div>
+  <div class="ob-cta">
+    <button class="btn" id="otp-next" disabled onclick="verifyOTP()">Vérifier · Verify</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 3: PROFILE ═══ -->
+<div class="step" id="s3">
+  <div class="ob-head">
+    <div class="back-btn" onclick="prevStep()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="ob-progress"><div class="ob-fill" style="width:37%"></div></div>
+    <div class="step-num">3 / 8</div>
+  </div>
+  <div class="ob-body" style="overflow-y:auto;-webkit-overflow-scrolling:touch">
+    <div class="ob-title">Ton <b>profil</b></div>
+    <div class="ob-sub">Informations de base · Basic information</div>
+    <div class="field">
+      <label>Nom complet · Full name</label>
+      <input class="inp" id="full-name" placeholder="Jean-Pierre Mbarga" oninput="checkProfile()">
+    </div>
+    <div class="field">
+      <label>Date de naissance · Date of birth</label>
+      <input class="inp" id="dob" type="date" oninput="checkProfile()" max="2006-01-01">
+    </div>
+    <div class="field">
+      <label>Ville · City</label>
+      <select class="inp" id="city" onchange="loadZones()">
+        <option value="">Choisir une ville · Choose city</option>
+        <option value="yaounde">Yaoundé</option>
+        <option value="douala">Douala</option>
+      </select>
+    </div>
+    <div class="field" id="zones-field" style="display:none">
+      <label>Zones d'opération · Coverage zones <span style="color:var(--t2);font-weight:400">(choisis toutes)</span></label>
+      <div class="zones-grid" id="zones-grid"></div>
+    </div>
+    <div class="field" id="store-name-field" style="display:none">
+      <label>Nom de la boutique · Store name</label>
+      <input class="inp" id="store-name" placeholder="Ma Boutique / My Store" oninput="checkProfile()">
+    </div>
+    <div class="field" id="store-type-field" style="display:none">
+      <label>Type de boutique · Store type</label>
+      <select class="inp" id="store-type" onchange="checkProfile()">
+        <option value="">Sélectionner · Select</option>
+        <option value="supermarket">Supermarché · Supermarket</option>
+        <option value="parfumerie">Parfumerie / Beauty</option>
+        <option value="pharmacy">Pharmacie</option>
+        <option value="hardware">Quincaillerie · Hardware</option>
+        <option value="electronics">Électronique · Electronics</option>
+        <option value="clothing">Prêt-à-porter · Clothing</option>
+        <option value="food">Alimentation · Food</option>
+        <option value="market">Marché · Market stall</option>
+        <option value="other">Autre · Other</option>
+      </select>
+    </div>
+  </div>
+  <div class="ob-cta">
+    <button class="btn" id="profile-next" disabled onclick="nextStep()">Continuer · Continue</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 4: DOCUMENTS ═══ -->
+<div class="step" id="s4">
+  <div class="ob-head">
+    <div class="back-btn" onclick="prevStep()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="ob-progress"><div class="ob-fill" style="width:50%"></div></div>
+    <div class="step-num">4 / 8</div>
+  </div>
+  <div class="ob-body" style="overflow-y:auto">
+    <div class="ob-title">Pièce <b>d'identité</b></div>
+    <div class="ob-sub">CNI (Carte Nationale d'Identité) requise · National ID required. Stored securely · Stocké de façon sécurisée.</div>
+    <div class="upload-grid">
+      <div class="upload-box" id="ub-cni-front" onclick="triggerUpload('cni-front')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 15s0-4 5-4 5 4 5 4M12 7a2 2 0 110 4 2 2 0 010-4z"/></svg>
+        <span>CNI Recto<br>Front</span>
+        <input type="file" id="cni-front" accept="image/*" capture="environment" onchange="markUpload('ub-cni-front','cni-front')">
+      </div>
+      <div class="upload-box" id="ub-cni-back" onclick="triggerUpload('cni-back')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 9h12M6 12h8M6 15h5"/></svg>
+        <span>CNI Verso<br>Back</span>
+        <input type="file" id="cni-back" accept="image/*" capture="environment" onchange="markUpload('ub-cni-back','cni-back')">
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <div class="field">
+        <label>Selfie tenant la CNI · Selfie holding your ID</label>
+        <div class="upload-box" id="ub-selfie" style="min-height:90px;flex-direction:row;gap:10px" onclick="triggerUpload('selfie')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span style="text-align:left">Photo de toi tenant ta CNI ouverte · Photo of you holding open ID</span>
+          <input type="file" id="selfie" accept="image/*" capture="user" onchange="markUpload('ub-selfie','selfie')">
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--s1);border:.5px solid var(--b1);border-radius:12px;padding:12px 14px;font-size:11px;color:var(--t2);line-height:1.6;margin-top:8px">
+      🔒 Tes documents sont chiffrés et stockés dans un bucket privé Supabase. Ils ne sont jamais partagés.<br>
+      <span style="color:var(--t3)">Your documents are encrypted and stored in a private Supabase bucket. Never shared.</span>
+    </div>
+  </div>
+  <div class="ob-cta">
+    <button class="btn" id="docs-next" disabled onclick="nextStep()">Continuer · Continue</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 5: DELIVERY TOGGLE (PICKER ONLY) ═══ -->
+<div class="step" id="s5">
+  <div class="ob-head">
+    <div class="back-btn" onclick="prevStep()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="ob-progress"><div class="ob-fill" style="width:62%"></div></div>
+    <div class="step-num">5 / 8</div>
+  </div>
+  <div class="ob-body" style="overflow-y:auto">
+    <div class="ob-title">Livraison <b>incluse</b> ?</div>
+    <div class="ob-sub">Tu peux aussi livrer les commandes après les avoir emballées · You can also deliver after packing</div>
+    <div class="toggle-row" id="delivery-toggle" onclick="toggleDelivery()">
+      <div class="toggle-info">
+        <div class="t">J'offre aussi la livraison · I also deliver</div>
+        <div class="s">Gagne en plus sur la livraison · Earn extra on delivery</div>
+      </div>
+      <div class="sw" id="del-sw"></div>
+    </div>
+    <div id="delivery-details" style="display:none;margin-top:16px">
+      <div class="field">
+        <label>Véhicule · Vehicle</label>
+        <div class="vehicle-grid" id="vehicle-grid">
+          <div class="vchip" onclick="selectVehicle(this,'moto')">🏍️ Moto</div>
+          <div class="vchip" onclick="selectVehicle(this,'voiture')">🚗 Voiture · Car</div>
+          <div class="vchip" onclick="selectVehicle(this,'velo')">🚲 Vélo · Bike</div>
+          <div class="vchip" onclick="selectVehicle(this,'tricycle')">🛺 Tricycle</div>
+          <div class="vchip" onclick="selectVehicle(this,'pied')">🚶 À pied · On foot</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Rayon de livraison (km) · Delivery radius (km)</label>
+        <select class="inp" id="del-radius">
+          <option value="1">1 km</option>
+          <option value="2" selected>2 km</option>
+          <option value="3">3 km</option>
+          <option value="5">5 km</option>
+          <option value="10">10 km+</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Disponibilités · Availability</label>
+        <div class="hours-grid" id="hours-grid"></div>
+      </div>
+      <div class="field">
+        <label>Numéro de plaque (optionnel) · Plate number (optional)</label>
+        <input class="inp" id="plate" placeholder="LT 1234 A">
+      </div>
+    </div>
+    <div id="no-delivery-msg" style="margin-top:16px;background:var(--s1);border:.5px solid var(--b1);border-radius:12px;padding:14px 16px">
+      <div style="font-size:13px;font-weight:500;color:var(--t2)">🚚 Les livraisons seront assurées par les livreurs DELIVERA</div>
+      <div style="font-size:11px;color:var(--t3);margin-top:4px">Delivery will be handled by DELIVERA dispatchers</div>
+    </div>
+  </div>
+  <div class="ob-cta">
+    <button class="btn" onclick="nextStep()">Continuer · Continue</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 6: QUIZ ═══ -->
+<div class="step" id="s6">
+  <div class="ob-head">
+    <div class="back-btn" onclick="prevStep()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="ob-progress"><div class="ob-fill" style="width:75%"></div></div>
+    <div class="step-num">6 / 8</div>
+  </div>
+  <div class="ob-body" style="overflow-y:auto">
+    <div class="ob-title"><b>Quiz</b> de qualification</div>
+    <div class="ob-sub">5 questions · Score 4/5 pour passer · 5 questions, score 4/5 to pass</div>
+    <div class="quiz-progress" id="quiz-prog"></div>
+    <div id="quiz-container"></div>
+    <div id="quiz-result" style="display:none;text-align:center;padding:20px 0">
+      <div id="qr-icon" style="font-size:48px;margin-bottom:12px"></div>
+      <div id="qr-title" style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:6px"></div>
+      <div id="qr-sub" style="font-size:13px;color:var(--t2)"></div>
+    </div>
+  </div>
+  <div class="ob-cta">
+    <button class="btn" id="quiz-next" disabled onclick="nextStep()">Continuer · Continue</button>
+  </div>
+</div>
+
+<!-- ═══ STEP 7: PAYMENT ═══ -->
+<div class="step" id="s7">
+  <div class="ob-head">
+    <div class="back-btn" onclick="prevStep()"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="ob-progress"><div class="ob-fill" style="width:87%"></div></div>
+    <div class="step-num">7 / 8</div>
+  </div>
+  <div class="ob-body" style="overflow-y:auto">
+    <div class="ob-title">Frais <b>d'activation</b></div>
+    <div class="ob-sub" id="pay-sub">Frais d'inscription uniques · One-time registration fee</div>
+    <div class="pay-summary">
+      <div class="pay-row"><span class="pay-label">Frais d'activation · Activation fee</span><span class="pay-val" id="fee-val">500 FCFA</span></div>
+      <div class="pay-row"><span class="pay-label">Vérification ID · ID verification</span><span class="pay-val" style="color:var(--green)">Inclus ✓</span></div>
+      <div class="pay-row"><span class="pay-label">Accès plateforme · Platform access</span><span class="pay-val" style="color:var(--green)">À vie · Lifetime ✓</span></div>
+      <div class="pay-row pay-total"><span class="pay-label">Total</span><span class="pay-val" id="total-val">500 FCFA</span></div>
+    </div>
+    <div style="font-size:11px;color:var(--t3);margin-bottom:14px;text-align:center">Choisir mode de paiement · Choose payment method</div>
+    <div class="pay-methods">
+      <div class="pay-method" id="pm-momo" onclick="selectPayment('momo')">
+        <div class="pay-method-icon pm-mtn">📱</div>
+        <div class="pm-info">
+          <div class="pm-name">MTN Mobile Money</div>
+          <div class="pm-sub" id="momo-sub">+237 6XX XXX XXX</div>
+        </div>
+        <div class="pm-radio"><svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4"/></svg></div>
+      </div>
+      <div class="pay-method" id="pm-om" onclick="selectPayment('om')">
+        <div class="pay-method-icon pm-om">🔶</div>
+        <div class="pm-info">
+          <div class="pm-name">Orange Money</div>
+          <div class="pm-sub" id="om-sub">+237 6XX XXX XXX</div>
+        </div>
+        <div class="pm-radio"><svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4"/></svg></div>
+      </div>
+    </div>
+    <div class="field" id="payment-number-field" style="display:none">
+      <label id="payment-number-label">Numéro MoMo · MoMo number</label>
+      <input class="inp" id="payment-number" type="tel" placeholder="6XX XXX XXX" oninput="checkPayment()">
+      <div style="font-size:11px;color:var(--t3);margin-top:5px" id="payment-instruction"></div>
+    </div>
+    <div style="background:var(--s1);border:.5px solid var(--b1);border-radius:12px;padding:12px 14px;font-size:11px;color:var(--t2);line-height:1.6;margin-top:4px">
+      💳 Paiement sécurisé via Monetbil · Secure payment via Monetbil. Reçu généré automatiquement · Receipt generated automatically.
+    </div>
+  </div>
+  <div class="ob-cta">
+    <button class="btn" id="pay-btn" disabled onclick="processPayment()">
+      <span id="pay-btn-text">Payer et s'inscrire · Pay & Register</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══ STEP 8: RECEIPT ═══ -->
+<div class="step" id="s8">
+  <div class="ob-body" style="overflow-y:auto">
+    <div class="receipt-screen">
+      <div class="receipt-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="receipt-title">Inscription envoyée ! 🎉</div>
+      <div style="font-family:'DM Sans';font-size:13px;color:var(--t2)">Application submitted!</div>
+      <div class="receipt-sub" style="margin-top:8px">
+        Ton dossier est en cours d'examen · Your application is under review.<br>
+        Délai : <b>24-48h</b> · Response time: <b>24-48h</b>
+      </div>
+      <div class="receipt-card" style="text-align:left">
+        <div class="rc-field"><span class="rc-field-label">Application ID</span><span class="rc-field-val" id="app-id" style="font-family:'Syne';color:var(--gold)">—</span></div>
+        <div class="rc-field"><span class="rc-field-label">Nom · Name</span><span class="rc-field-val" id="rec-name">—</span></div>
+        <div class="rc-field"><span class="rc-field-label">Rôle · Role</span><span class="rc-field-val" id="rec-role">—</span></div>
+        <div class="rc-field"><span class="rc-field-label">Ville · City</span><span class="rc-field-val" id="rec-city">—</span></div>
+        <div class="rc-field"><span class="rc-field-label">Paiement · Payment</span><span class="rc-field-val" style="color:var(--green)">Confirmé ✓</span></div>
+        <div class="rc-field"><span class="rc-field-label">Statut · Status</span><span class="rc-field-val"><span class="status-badge">⏳ En examen · Under review</span></span></div>
+      </div>
+      <div style="background:var(--s1);border:.5px solid var(--gb);border-radius:12px;padding:14px 16px;text-align:left;margin-top:4px">
+        <div style="font-size:12px;font-weight:600;color:var(--gold);margin-bottom:6px">Prochaines étapes · Next steps</div>
+        <div style="font-size:12px;color:var(--t2);line-height:1.7">
+          1. Examen de ton dossier (24-48h) · Application review<br>
+          2. Notification WhatsApp · WhatsApp notification<br>
+          3. Formation en ligne (30 min) · Online training<br>
+          4. Première commande ! · First order!
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ob-cta">
+    <button class="btn grn" onclick="window.location='index.html'">Retour à l'accueil · Back to app</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="shareReceipt()">Partager · Share receipt</button>
+  </div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+const state = {
+  role: null,
+  phone: null,
+  fullPhone: null,
+  otp: '123456', // dev mode
+  name: null,
+  dob: null,
+  city: null,
+  zones: [],
+  storeName: null,
+  storeType: null,
+  cniF: false,
+  cniB: false,
+  selfie: false,
+  offersDelivery: false,
+  vehicle: null,
+  deliveryRadius: 2,
+  quizScore: 0,
+  quizPassed: false,
+  payMethod: null,
+  payNumber: null,
+  appId: null
+};
+
+let currentStep = 0;
+const TOTAL_STEPS = 8;
+
+const ZONES = {
+  yaounde: ['Bastos','Mvan','Biyem-Assi','Nlongkak','Tsinga','Ekounou','Essos','Emana','Mfandena','Mvog-Ada','Marché Central','Omnisports','Mendong','Nkol-Bisson','Ngousso'],
+  douala: ['Bonanjo','Akwa','Deido','Bali','Bonapriso','Makepe','Logbessou','PK8','Ndogbong','New Bell','Bassa','Mboppi','Cité des Palmiers','Kotto','Yassa']
+};
+
+const QUIZ = [
+  {
+    q: 'Un client commande de l\'huile à 2.500F mais tu vois que le prix en rayon est 2.700F. Que fais-tu ?',
+    opts: ['Tu achètes quand même à 2.700F sans rien dire','Tu signales le désaccord de prix dans l\'app et attends confirmation','Tu annules la commande','Tu paies 2.700F et demandes remboursement'],
+    correct: 1, en: 'A customer ordered oil at 2,500F but shelf price is 2,700F. You...'
+  },
+  {
+    q: 'Quelle est l\'étape OBLIGATOIRE avant de dispatcher une commande ?',
+    opts: ['Prendre un selfie avec le sac','Filmer ou photographier le sac scellé avec le bon de commande visible','Appeler le client','Peser le sac'],
+    correct: 1, en: 'What is MANDATORY before dispatching an order?'
+  },
+  {
+    q: 'Comment confirmes-tu une livraison réussie ?',
+    opts: ['En cliquant "Livré" sans rien faire','Le client entre son PIN ou scanne le QR code','Tu prends une photo de la porte','Tu envoies un message WhatsApp'],
+    correct: 1, en: 'How do you confirm a successful delivery?'
+  },
+  {
+    q: 'Que se passe-t-il si tu reçois 3 violations de la politique de qualité ?',
+    opts: ['Rien','Un avertissement','Suspension automatique du compte','Réduction des gains'],
+    correct: 2, en: 'What happens after 3 quality policy violations?'
+  },
+  {
+    q: 'Combien gagnes-tu par commande comme picker (hors livraison) ?',
+    opts: ['500 FCFA','700 FCFA','1.000 FCFA','1.500 FCFA'],
+    correct: 1, en: 'How much do you earn per order as a picker (excluding delivery)?'
+  }
+];
+
+let quizAnswers = {};
+let quizCurrent = 0;
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function nextStep(){
+  // Validate current step
+  if(currentStep === 3 && state.role === 'store'){
+    // Skip quiz for stores, go to step 6 → 7
+  }
+  goToStep(currentStep + 1);
+}
+
+function prevStep(){
+  if(currentStep <= 1){ currentStep=0; showStep(0); return; }
+  goToStep(currentStep - 1);
+}
+
+function goToStep(n){
+  // For stores, skip step 5 (delivery) and step 6 (quiz)
+  if(state.role === 'store' && n === 5) n = 7;
+  if(state.role === 'store' && n === 6) n = 7;
+  // Don't go past end
+  if(n > TOTAL_STEPS) return;
+  currentStep = n;
+  showStep(n);
+}
+
+function showStep(n){
+  document.querySelectorAll('.step').forEach((s,i) => {
+    s.classList.toggle('active', i === n);
+  });
+  // Render dynamic content
+  if(n === 5) renderHours();
+  if(n === 6) renderQuiz();
+  if(n === 7) renderPaymentStep();
+}
+
+// ══════════════════════════════════════════
+// ROLE SELECT
+// ══════════════════════════════════════════
+function selectRole(role){
+  state.role = role;
+  document.getElementById('rc-picker').classList.toggle('selected', role==='picker');
+  document.getElementById('rc-store').classList.toggle('selected', role==='store');
+  document.getElementById('role-next').disabled = false;
+  // Update fee display
+  document.getElementById('fee-val').textContent = role==='store' ? '2.000 FCFA' : '500 FCFA';
+  document.getElementById('total-val').textContent = role==='store' ? '2.000 FCFA' : '500 FCFA';
+}
+
+// ══════════════════════════════════════════
+// PHONE
+// ══════════════════════════════════════════
+function checkPhone(){
+  const v = document.getElementById('phone-inp').value;
+  document.getElementById('phone-next').disabled = v.length < 8;
+}
+
+function sendOTP(){
+  const prefix = document.getElementById('phone-prefix').value;
+  const num = document.getElementById('phone-inp').value;
+  if(num.length < 8){ toast('Numéro invalide'); return; }
+  state.phone = num;
+  state.fullPhone = '+' + prefix + num;
+  document.getElementById('otp-sub').textContent = 'Code envoyé sur WhatsApp au ' + state.fullPhone;
+  // In production: call /api/send-otp
+  const devCode = Math.floor(100000+Math.random()*900000).toString();
+  state.otp = devCode;
+  document.getElementById('dev-otp').textContent = devCode;
+  toast('Code envoyé ! · Code sent!');
+  goToStep(2);
+}
+
+function otpMove(el, next){
+  if(el.value.length === 1 && next){
+    document.getElementById(next).focus();
+  }
+  checkOTP();
+}
+function otpBack(el, e, prev){
+  if(e.key==='Backspace' && !el.value && prev) document.getElementById(prev).focus();
+}
+function checkOTP(){
+  const code = ['o1','o2','o3','o4','o5','o6'].map(id=>document.getElementById(id).value).join('');
+  document.getElementById('otp-next').disabled = code.length < 6;
+}
+function verifyOTP(){
+  const code = ['o1','o2','o3','o4','o5','o6'].map(id=>document.getElementById(id).value).join('');
+  if(code === state.otp || code === '123456'){
+    toast('✓ Numéro vérifié · Number verified');
+    goToStep(3);
+  } else {
+    toast('Code incorrect · Wrong code');
+    ['o1','o2','o3','o4','o5','o6'].forEach(id=>{ document.getElementById(id).value=''; });
+    document.getElementById('o1').focus();
+  }
+}
+
+// ══════════════════════════════════════════
+// PROFILE
+// ══════════════════════════════════════════
+function loadZones(){
+  const city = document.getElementById('city').value;
+  state.city = city;
+  const zf = document.getElementById('zones-field');
+  const sf = document.getElementById('store-name-field');
+  const stf = document.getElementById('store-type-field');
+  if(!city){ zf.style.display='none'; return; }
+  zf.style.display = state.role==='picker' ? 'block' : 'none';
+  sf.style.display = state.role==='store' ? 'block' : 'none';
+  stf.style.display = state.role==='store' ? 'block' : 'none';
+  if(state.role==='picker'){
+    const grid = document.getElementById('zones-grid');
+    grid.innerHTML = (ZONES[city]||[]).map(z=>`<div class="zone-chip" onclick="toggleZone(this,'${z}')">${z}</div>`).join('');
+  }
+  checkProfile();
+}
+
+function toggleZone(el, zone){
+  el.classList.toggle('on');
+  const idx = state.zones.indexOf(zone);
+  if(idx === -1) state.zones.push(zone);
+  else state.zones.splice(idx,1);
+  checkProfile();
+}
+
+function checkProfile(){
+  const name = document.getElementById('full-name').value;
+  const dob = document.getElementById('dob').value;
+  const city = document.getElementById('city').value;
+  state.name = name;
+  state.dob = dob;
+  let ok = name.length > 2 && dob && city;
+  if(state.role==='picker') ok = ok && state.zones.length > 0;
+  if(state.role==='store'){
+    const sn = document.getElementById('store-name').value;
+    const st = document.getElementById('store-type').value;
+    ok = ok && sn.length > 1 && st;
+    state.storeName = sn;
+    state.storeType = st;
+  }
+  document.getElementById('profile-next').disabled = !ok;
+}
+
+// ══════════════════════════════════════════
+// DOCUMENTS
+// ══════════════════════════════════════════
+function triggerUpload(id){ document.getElementById(id).click(); }
+function markUpload(boxId, inputId){
+  const box = document.getElementById(boxId);
+  const file = document.getElementById(inputId).files[0];
+  if(!file) return;
+  box.classList.add('done');
+  box.querySelector('span').textContent = '✓ ' + file.name.substring(0,20);
+  if(inputId==='cni-front') state.cniF = true;
+  if(inputId==='cni-back') state.cniB = true;
+  if(inputId==='selfie') state.selfie = true;
+  const docsOk = state.cniF && state.cniB && state.selfie;
+  document.getElementById('docs-next').disabled = !docsOk;
+}
+
+// ══════════════════════════════════════════
+// DELIVERY
+// ══════════════════════════════════════════
+function toggleDelivery(){
+  state.offersDelivery = !state.offersDelivery;
+  document.getElementById('del-sw').classList.toggle('on', state.offersDelivery);
+  document.getElementById('delivery-details').style.display = state.offersDelivery ? 'block' : 'none';
+  document.getElementById('no-delivery-msg').style.display = state.offersDelivery ? 'none' : 'block';
+}
+function selectVehicle(el, v){
+  state.vehicle = v;
+  document.querySelectorAll('.vchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+function renderHours(){
+  if(document.getElementById('hours-grid').innerHTML) return;
+  const days = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  document.getElementById('hours-grid').innerHTML = days.map(d=>`
+    <div class="day-row">
+      <div class="day-toggle">
+        <span class="day-name">${d}</span>
+        <div class="sw on" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div style="font-size:10px;color:var(--t3);margin-top:4px">8h – 20h</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+// QUIZ
+// ══════════════════════════════════════════
+function renderQuiz(){
+  if(state.role === 'store'){ nextStep(); return; }
+  quizCurrent = 0;
+  quizAnswers = {};
+  showQuestion(0);
+  updateQuizProgress();
+}
+function showQuestion(idx){
+  const q = QUIZ[idx];
+  if(!q) return showQuizResult();
+  document.getElementById('quiz-container').innerHTML = `
+    <div class="quiz-q">
+      <div class="quiz-num">Question ${idx+1} / ${QUIZ.length}</div>
+      <div class="quiz-text">${q.q}</div>
+      <div class="quiz-opts">${q.opts.map((o,i)=>`<div class="quiz-opt" id="qo${i}" onclick="answerQuiz(${i})">${o}</div>`).join('')}</div>
+    </div>`;
+}
+function answerQuiz(i){
+  const q = QUIZ[quizCurrent];
+  quizAnswers[quizCurrent] = i;
+  document.querySelectorAll('.quiz-opt').forEach((el,idx)=>{
+    if(idx===q.correct) el.classList.add('correct');
+    else if(idx===i && i!==q.correct) el.classList.add('wrong');
+  });
+  setTimeout(()=>{ quizCurrent++; updateQuizProgress(); showQuestion(quizCurrent); }, 900);
+}
+function updateQuizProgress(){
+  const pg = document.getElementById('quiz-prog');
+  if(!pg) return;
+  pg.innerHTML = QUIZ.map((_,i)=>`<div class="qp ${i<quizCurrent?'done':''}"></div>`).join('');
+}
+function showQuizResult(){
+  const score = Object.entries(quizAnswers).filter(([i,a])=>QUIZ[i].correct===a).length;
+  state.quizScore = score;
+  state.quizPassed = score >= 4;
+  document.getElementById('quiz-container').style.display='none';
+  document.getElementById('quiz-result').style.display='block';
+  if(state.quizPassed){
+    document.getElementById('qr-icon').textContent='🎉';
+    document.getElementById('qr-title').textContent=`${score}/5 — Félicitations !`;
+    document.getElementById('qr-sub').textContent='Tu as passé le quiz. · You passed the quiz.';
+    document.getElementById('quiz-next').disabled=false;
+  } else {
+    document.getElementById('qr-icon').textContent='😔';
+    document.getElementById('qr-title').textContent=`${score}/5 — Réessaie`;
+    document.getElementById('qr-sub').textContent='Score minimum 4/5. Retente dans 24h. · Min score 4/5. Retry in 24h.';
+    document.getElementById('quiz-next').textContent='Réessayer demain · Retry tomorrow';
+    document.getElementById('quiz-next').disabled=false;
+    document.getElementById('quiz-next').onclick=()=>window.location='index.html';
+  }
+}
+
+// ══════════════════════════════════════════
+// PAYMENT
+// ══════════════════════════════════════════
+function renderPaymentStep(){
+  const fee = state.role==='store' ? '2.000' : '500';
+  document.getElementById('fee-val').textContent = fee + ' FCFA';
+  document.getElementById('total-val').textContent = fee + ' FCFA';
+  document.getElementById('pay-sub').textContent = state.role==='store'
+    ? 'Frais d\'activation boutique · Store activation fee'
+    : 'Frais d\'inscription picker · Picker registration fee';
+  // Pre-fill phone number from verification
+  if(state.phone){
+    document.getElementById('momo-sub').textContent = '+237 ' + state.phone;
+    document.getElementById('om-sub').textContent = '+237 ' + state.phone;
+  }
+}
+function selectPayment(method){
+  state.payMethod = method;
+  document.getElementById('pm-momo').classList.toggle('selected', method==='momo');
+  document.getElementById('pm-om').classList.toggle('selected', method==='om');
+  const field = document.getElementById('payment-number-field');
+  field.style.display='block';
+  const label = document.getElementById('payment-number-label');
+  const instr = document.getElementById('payment-instruction');
+  if(method==='momo'){
+    label.textContent='Numéro MTN MoMo · MTN MoMo number';
+    instr.textContent='Compose *126# pour confirmer le paiement · Dial *126# to confirm payment';
+  } else {
+    label.textContent='Numéro Orange Money · Orange Money number';
+    instr.textContent='Tu recevras une invite de paiement · You will receive a payment prompt';
+  }
+  // Pre-fill with registered phone
+  if(state.phone) document.getElementById('payment-number').value = state.phone;
+  checkPayment();
+}
+function checkPayment(){
+  const num = document.getElementById('payment-number').value;
+  state.payNumber = num;
+  document.getElementById('pay-btn').disabled = !state.payMethod || num.length < 8;
+}
+
+async function processPayment(){
+  const btn = document.getElementById('pay-btn');
+  const btnText = document.getElementById('pay-btn-text');
+  btn.disabled = true;
+  btnText.innerHTML = '<div class="spin"></div> Traitement · Processing...';
+
+  // Save application to Supabase (or local fallback)
+  const appId = 'DLV-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substr(2,4).toUpperCase();
+  state.appId = appId;
+
+  try {
+    // Try Supabase save
+    if(window.__supabase){
+      await window.__supabase.from('picker_applications').insert({
+        full_name: state.name,
+        phone: state.fullPhone,
+        city: state.city,
+        zones: state.zones,
+        quiz_score: state.quizScore,
+        quiz_passed: state.quizPassed,
+        offers_delivery: state.offersDelivery,
+        vehicle_type: state.vehicle,
+        status: 'pending'
+      });
+    }
+  } catch(e){ console.warn('Supabase save skipped:', e); }
+
+  // In production: call /api/pay with Monetbil
+  // For now: simulate payment confirmation after 2s
+  setTimeout(()=>{
+    showReceipt();
+  }, 2000);
+}
+
+function showReceipt(){
+  document.getElementById('app-id').textContent = state.appId;
+  document.getElementById('rec-name').textContent = state.name || '—';
+  document.getElementById('rec-role').textContent = state.role==='store' ? 'Partenaire Boutique · Store Partner' : 'Picker / Livreur';
+  document.getElementById('rec-city').textContent = (state.city||'—').charAt(0).toUpperCase() + (state.city||'').slice(1);
+  currentStep = 8;
+  showStep(8);
+}
+
+function shareReceipt(){
+  if(navigator.share){
+    navigator.share({
+      title:'DELIVERA — Inscription',
+      text:`Mon ID d'inscription DELIVERA: ${state.appId}`,
+      url: window.location.href
+    });
+  } else {
+    navigator.clipboard.writeText(`DELIVERA Application ID: ${state.appId}`);
+    toast('ID copié · ID copied!');
+  }
+}
+
+// ══════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+showStep(0);
+</script>
+</body>
+</html>

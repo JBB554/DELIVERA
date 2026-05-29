@@ -1223,7 +1223,7 @@ function renderProfileMenu(){
     </div>`).join('');
 }
 function profileAct(a){
-  if(a==='picker'){ window.location='onboarding.html'; }
+  if(a==='picker'){ window.location='onboarding.html'; return; }
   else if(a==='partner') openSheet('sh-partner');
   else if(a==='addresses') openSheet('sh-addr');
   else if(a==='orders'){ showScreen('S-track'); renderTrack(); }
@@ -1267,6 +1267,12 @@ setTimeout(()=>{
   applyLang(); renderOB();
 },2600);
 document.addEventListener('swift:lang', ()=>{ applyLang(); renderOB(); });
+</script>
+
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').then(r=>console.log('SW registered')).catch(e=>console.warn('SW failed',e));
+}
 </script>
 </body>
 </html>

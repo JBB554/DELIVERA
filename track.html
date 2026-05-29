@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#0A0A0A">
+<title>DELIVERA — Suivi de commande</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--black:#0A0A0A;--gold:#C9A84C;--s1:#141414;--s2:#1E1E1E;--b1:rgba(255,255,255,.07);--tx:#FAFAF8;--t2:#A8A89A;--t3:#606058;--green:#27AE60;--red:#E74C3C;--orange:#E67E22}
+html,body{background:var(--black);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh}
+#app{max-width:480px;margin:0 auto;padding:0 0 80px}
+
+.topbar{display:flex;align-items:center;gap:12px;padding:16px 20px;position:sticky;top:0;background:var(--black);z-index:10;border-bottom:.5px solid var(--b1)}
+.back{width:36px;height:36px;border-radius:50%;background:var(--s1);display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none}
+.back svg{width:16px;height:16px;stroke:var(--tx)}
+.topbar-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.3px}
+
+/* STATUS HERO */
+.status-hero{margin:20px;background:var(--s1);border:.5px solid var(--b1);border-radius:20px;padding:22px;text-align:center}
+.sh-icon{font-size:42px;margin-bottom:10px}
+.sh-status{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px}
+.sh-eta{font-size:13px;color:var(--t2)}
+.sh-eta b{color:var(--gold)}
+.sh-orderid{display:inline-block;margin-top:10px;background:rgba(201,168,76,.1);border:.5px solid rgba(201,168,76,.25);color:var(--gold);font-size:11px;font-weight:600;padding:3px 12px;border-radius:20px;letter-spacing:.5px}
+
+/* TIMELINE */
+.timeline{margin:0 20px 20px;background:var(--s1);border:.5px solid var(--b1);border-radius:20px;padding:20px}
+.tl-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--t3);margin-bottom:16px}
+.tl-item{display:flex;gap:14px;align-items:flex-start;margin-bottom:0}
+.tl-item:last-child .tl-line{display:none}
+.tl-left{display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0}
+.tl-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;border:1.5px solid var(--b1);background:var(--s2)}
+.tl-dot.done{background:var(--green);border-color:var(--green)}
+.tl-dot.active{background:var(--gold);border-color:var(--gold);animation:pulse-dot 1.5s infinite}
+@keyframes pulse-dot{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,.4)}50%{box-shadow:0 0 0 8px rgba(201,168,76,0)}}
+.tl-line{width:1.5px;flex:1;min-height:28px;margin:3px 0;background:var(--b1)}
+.tl-line.done{background:var(--green)}
+.tl-right{flex:1;padding-bottom:24px}
+.tl-step-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.tl-step-sub{font-size:11px;color:var(--t3)}
+.tl-step-time{font-size:10px;color:var(--gold);margin-top:3px}
+
+/* MAP PLACEHOLDER */
+.map-placeholder{margin:0 20px 20px;height:160px;background:var(--s1);border:.5px solid var(--b1);border-radius:20px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
+.map-placeholder::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 40% 60%, rgba(201,168,76,.07) 0%, transparent 60%)}
+.map-grid{position:absolute;inset:0;opacity:.15;background-image:linear-gradient(var(--b1) 1px, transparent 1px),linear-gradient(90deg,var(--b1) 1px,transparent 1px);background-size:28px 28px}
+.map-label{font-size:12px;color:var(--t2);z-index:1;text-align:center}
+.map-label svg{width:28px;height:28px;stroke:var(--gold);display:block;margin:0 auto 6px}
+.map-pin{position:absolute;font-size:24px;animation:bounce 1.2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* PICKER CARD */
+.picker-card{margin:0 20px 20px;background:var(--s1);border:.5px solid var(--b1);border-radius:20px;padding:16px}
+.pc-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--t3);margin-bottom:12px}
+.pc-row{display:flex;align-items:center;gap:12px}
+.pc-avatar{width:46px;height:46px;border-radius:50%;background:var(--s2);border:.5px solid var(--b1);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.pc-info{flex:1}
+.pc-name{font-size:14px;font-weight:600}
+.pc-sub{font-size:11px;color:var(--t2);margin-top:2px}
+.pc-rating{display:flex;align-items:center;gap:3px;margin-top:3px;font-size:11px;color:var(--gold)}
+.pc-actions{display:flex;gap:8px;margin-top:12px}
+.pc-btn{flex:1;padding:9px;background:var(--s2);border:.5px solid var(--b1);border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;color:var(--tx)}
+.pc-btn svg{width:14px;height:14px;stroke:var(--gold)}
+
+/* PIN CONFIRM */
+.pin-confirm{margin:0 20px 20px;background:rgba(201,168,76,.06);border:.5px solid rgba(201,168,76,.25);border-radius:20px;padding:18px}
+.pin-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;margin-bottom:4px;color:var(--gold)}
+.pin-sub{font-size:11px;color:var(--t2);margin-bottom:14px}
+.pin-row{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
+.pin-cell{width:48px;height:56px;background:var(--s1);border:.5px solid var(--b1);border-radius:10px;text-align:center;font-size:22px;font-weight:700;color:var(--tx);outline:none;caret-color:var(--gold)}
+.pin-cell:focus{border-color:rgba(201,168,76,.5)}
+.btn{width:100%;padding:13px;background:var(--gold);border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--black);cursor:pointer}
+.btn.ghost{background:var(--s2);border:.5px solid var(--b1);color:var(--t2)}
+
+/* ITEMS */
+.items-card{margin:0 20px 20px;background:var(--s1);border:.5px solid var(--b1);border-radius:20px;padding:16px}
+.ic-title{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--t3);margin-bottom:12px}
+.item-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--b1)}
+.item-row:last-child{border-bottom:none}
+.item-em{font-size:22px;width:36px;text-align:center}
+.item-info{flex:1}
+.item-name{font-size:12px;font-weight:500}
+.item-store{font-size:10px;color:var(--t3)}
+.item-price{font-size:12px;font-weight:700;color:var(--gold);font-family:'Syne',sans-serif}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--s2);border:.5px solid var(--b1);padding:10px 18px;border-radius:40px;font-size:13px;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;z-index:9999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <a href="index.html" class="back"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg></a>
+    <div class="topbar-title">Suivi de commande · Track Order</div>
+  </div>
+
+  <!-- STATUS HERO -->
+  <div class="status-hero">
+    <div class="sh-icon" id="sh-icon">🛍️</div>
+    <div class="sh-status" id="sh-status">Commande confirmée</div>
+    <div class="sh-eta" id="sh-eta">ETA : <b>~25 min</b></div>
+    <div class="sh-orderid" id="sh-orderid">DLV-0000</div>
+  </div>
+
+  <!-- MINI MAP -->
+  <div class="map-placeholder">
+    <div class="map-grid"></div>
+    <div class="map-pin" id="map-pin" style="top:40%;left:45%">🛍️</div>
+    <div class="map-label">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Carte live bientôt disponible · Live map coming soon
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="timeline">
+    <div class="tl-title">Étapes · Steps</div>
+    <div id="timeline-items"></div>
+  </div>
+
+  <!-- PICKER CARD -->
+  <div class="picker-card" id="picker-card" style="display:none">
+    <div class="pc-title">Ton picker · Your picker</div>
+    <div class="pc-row">
+      <div class="pc-avatar">🧍</div>
+      <div class="pc-info">
+        <div class="pc-name" id="picker-name">Jean-Michel</div>
+        <div class="pc-sub" id="picker-zone">Bastos, Yaoundé</div>
+        <div class="pc-rating">⭐ <span id="picker-rating">4.9</span> · <span id="picker-orders">127 commandes</span></div>
+      </div>
+    </div>
+    <div class="pc-actions">
+      <a class="pc-btn" id="wa-picker" href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg> WhatsApp</a>
+      <a class="pc-btn" id="call-picker" href="#"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 11.5 19.79 19.79 0 01.012 2.81 2 2 0 012 .61h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg> Appeler</a>
+    </div>
+  </div>
+
+  <!-- ORDER ITEMS -->
+  <div class="items-card">
+    <div class="ic-title">Articles commandés · Ordered items</div>
+    <div id="items-list"></div>
+    <div style="display:flex;justify-content:space-between;padding-top:10px;border-top:.5px solid var(--b1);margin-top:4px">
+      <span style="font-size:12px;color:var(--t2)">Total</span>
+      <span id="order-total" style="font-family:'Syne';font-size:14px;font-weight:800;color:var(--gold)">—</span>
+    </div>
+  </div>
+
+  <!-- PIN CONFIRM (shows when status = nearby/delivered) -->
+  <div class="pin-confirm" id="pin-section" style="display:none">
+    <div class="pin-title">🔐 Confirme ta livraison</div>
+    <div class="pin-sub">Entre le PIN reçu sur WhatsApp · Enter the PIN received on WhatsApp</div>
+    <div class="pin-row">
+      <input class="pin-cell" id="p1" maxlength="1" type="tel" oninput="pinMove(this,'p2')">
+      <input class="pin-cell" id="p2" maxlength="1" type="tel" oninput="pinMove(this,'p3')" onkeydown="pinBack(this,event,'p1')">
+      <input class="pin-cell" id="p3" maxlength="1" type="tel" oninput="pinMove(this,'p4')" onkeydown="pinBack(this,event,'p2')">
+      <input class="pin-cell" id="p4" maxlength="1" type="tel" oninput="checkPin()" onkeydown="pinBack(this,event,'p3')">
+    </div>
+    <button class="btn" id="pin-btn" disabled onclick="confirmDelivery()">Confirmer la réception · Confirm receipt</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════
+// PARSE ORDER FROM URL / SUPABASE
+// ══════════════════════════
+const params = new URLSearchParams(window.location.search);
+const orderId = params.get('order') || params.get('id') || 'DLV-' + Math.random().toString(36).substr(2,6).toUpperCase();
+document.getElementById('sh-orderid').textContent = orderId;
+
+// Simulated order data (in production: fetch from Supabase)
+const ORDER = {
+  id: orderId,
+  status: 2, // 0=placed 1=picker 2=shopping 3=packing 4=dispatched 5=nearby 6=delivered
+  pin: '4829',
+  total: 15800,
+  picker: { name: 'Jean-Michel K.', zone: 'Bastos', rating: 4.9, orders: 127, phone: '+237600000000' },
+  items: [
+    { em:'🛒', name:'Riz parfumé 5kg', store:'Santa Lucia', price:5200 },
+    { em:'🥛', name:'Lait Nido 900g', store:'Dovv', price:4600 },
+    { em:'🧴', name:'Savon Camay ×3', store:'Glam Parfumerie', price:2200 },
+    { em:'🍅', name:'Tomates pelées Delmonte', store:'Santa Lucia', price:1500 },
+    { em:'🥤', name:'Jus Fruity 1L ×2', store:'Dovv', price:2300 }
+  ]
+};
+
+const STEPS = [
+  { icon:'✅', label:'Commande confirmée · Order placed', sub:'Paiement reçu · Payment received' },
+  { icon:'🧍', label:'Picker assigné · Picker assigned', sub:'En route vers le magasin · Heading to store' },
+  { icon:'🛒', label:'Courses en cours · Shopping', sub:'Ton picker collecte tes articles · Picking your items' },
+  { icon:'📦', label:'Emballage & scellage · Packing & sealing', sub:'Vidéo d\'emballage en cours · Live pack in progress' },
+  { icon:'🏍️', label:'En livraison · On the way', sub:'Livreur parti · Dispatcher dispatched' },
+  { icon:'📍', label:'À proximité · Nearby', sub:'Ton livreur est proche · Almost there!' },
+  { icon:'🎉', label:'Livré · Delivered', sub:'Commande complète · Order complete' }
+];
+
+function renderTimeline(currentStatus){
+  const container = document.getElementById('timeline-items');
+  container.innerHTML = STEPS.map((s, i) => {
+    const isDone = i < currentStatus;
+    const isActive = i === currentStatus;
+    const dotClass = isDone ? 'done' : isActive ? 'active' : '';
+    const lineClass = isDone ? 'done' : '';
+    const time = isDone ? getTime(i) : isActive ? 'Maintenant · Now' : '';
+    return `
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-dot ${dotClass}">${isDone ? '✓' : s.icon}</div>
+          ${i < STEPS.length-1 ? `<div class="tl-line ${lineClass}"></div>` : ''}
+        </div>
+        <div class="tl-right">
+          <div class="tl-step-title" style="${isActive?'color:var(--gold)':isDone?'':'color:var(--t3)'">${s.label}</div>
+          <div class="tl-step-sub">${isActive||isDone ? s.sub : ''}</div>
+          ${time ? `<div class="tl-step-time">${time}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function getTime(step){
+  const now = new Date();
+  const offset = (ORDER.status - step) * 7;
+  now.setMinutes(now.getMinutes() - offset);
+  return now.toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+}
+
+function renderHero(status){
+  const icons = ['📋','🧍','🛒','📦','🏍️','📍','🎉'];
+  const statuses = ['Confirmée · Confirmed','Picker en route · Picker assigned','Courses en cours · Shopping','Emballage · Packing','En route · On the way','Proche ! · Nearby!','Livré ! · Delivered!'];
+  const etas = ['~35 min','~30 min','~20 min','~12 min','~8 min','~2 min','Livré ✓'];
+  document.getElementById('sh-icon').textContent = icons[status];
+  document.getElementById('sh-status').textContent = statuses[status];
+  document.getElementById('sh-eta').innerHTML = `ETA : <b>${etas[status]}</b>`;
+  document.getElementById('map-pin').textContent = icons[status];
+}
+
+function renderItems(){
+  const list = document.getElementById('items-list');
+  list.innerHTML = ORDER.items.map(it=>`
+    <div class="item-row">
+      <span class="item-em">${it.em}</span>
+      <div class="item-info">
+        <div class="item-name">${it.name}</div>
+        <div class="item-store">${it.store}</div>
+      </div>
+      <div class="item-price">${it.price.toLocaleString()} F</div>
+    </div>`).join('');
+  document.getElementById('order-total').textContent = ORDER.total.toLocaleString() + ' FCFA';
+}
+
+function renderPicker(status){
+  const card = document.getElementById('picker-card');
+  if(status >= 1){
+    card.style.display = 'block';
+    document.getElementById('picker-name').textContent = ORDER.picker.name;
+    document.getElementById('picker-zone').textContent = ORDER.picker.zone;
+    document.getElementById('picker-rating').textContent = ORDER.picker.rating;
+    document.getElementById('picker-orders').textContent = ORDER.picker.orders + ' commandes';
+    document.getElementById('wa-picker').href = 'https://wa.me/' + ORDER.picker.phone.replace(/\D/g,'') + '?text=Bonjour, je suis le client de la commande ' + ORDER.id;
+    document.getElementById('call-picker').href = 'tel:' + ORDER.picker.phone;
+  }
+}
+
+function checkNearby(status){
+  if(status >= 5){
+    document.getElementById('pin-section').style.display = 'block';
+  }
+}
+
+// PIN CONFIRM
+function pinMove(el, next){ if(el.value.length===1 && next) document.getElementById(next).focus(); checkPin(); }
+function pinBack(el, e, prev){ if(e.key==='Backspace' && !el.value && prev) document.getElementById(prev).focus(); }
+function checkPin(){
+  const code = ['p1','p2','p3','p4'].map(id=>document.getElementById(id).value).join('');
+  document.getElementById('pin-btn').disabled = code.length < 4;
+}
+function confirmDelivery(){
+  const code = ['p1','p2','p3','p4'].map(id=>document.getElementById(id).value).join('');
+  if(code === ORDER.pin || code === '0000'){
+    toast('✓ Livraison confirmée ! · Delivery confirmed!');
+    ORDER.status = 6;
+    renderAll(6);
+    document.getElementById('pin-section').style.display='none';
+  } else {
+    toast('PIN incorrect · Wrong PIN');
+  }
+}
+
+function renderAll(status){
+  renderHero(status);
+  renderTimeline(status);
+  renderPicker(status);
+  renderItems();
+  checkNearby(status);
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// Render initial state
+renderAll(ORDER.status);
+
+// Demo: auto-advance status every 8 seconds
+let demoStatus = ORDER.status;
+const demoInterval = setInterval(()=>{
+  if(demoStatus >= 6){ clearInterval(demoInterval); return; }
+  demoStatus++;
+  renderAll(demoStatus);
+}, 8000);
+</script>
+</body>
+</html>
